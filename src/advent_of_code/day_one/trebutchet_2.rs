@@ -52,10 +52,6 @@ impl CalibrationValueExtractor {
             .replace("nine", "n9e")
     }
 
-    fn get_digits_from_line(line: &String) -> Vec<u32> {
-        todo!()
-    }
-
     fn extract_single_line_value(line: &String) -> u32 {
         let digits: Vec<u32> = Self::replace_digit_names_with_digits(line)
             .chars()
@@ -89,8 +85,8 @@ mod tests {
     use super::CalibrationValueExtractor;
 
     #[rstest]
-    #[case(String::from("1abc2"))]
-    #[case(String::from("treb7uchet"))]
+    #[case("1abc2")]
+    #[case("treb7uchet")]
     fn adds_lines_of_calibration_document(#[case] line: String) {
         let mut line_reader = LineReader::new();
 
@@ -99,24 +95,17 @@ mod tests {
         assert_eq!(line_reader.get_lines(), vec![line]);
     }
 
-    #[test]
-    fn extracts_all_digits_from_line() {
-        let digits = CalibrationValueExtractor::get_digits_from_line(&String::from("xtwone3four"));
-
-        assert_eq!(digits, [2, 1, 3, 4])
-    }
-
     #[rstest]
-    #[case(String::from("1abc2"), 12)]
-    #[case(String::from("treb7uchet"), 77)]
-    #[case(String::from("two1"), 21)]
-    #[case(String::from("two1nine"), 29)]
-    #[case(String::from("eightwothree"), 83)]
-    #[case(String::from("abcone2threexyz"), 13)]
-    #[case(String::from("xtwone3four"), 24)]
-    #[case(String::from("4nineeightseven2"), 42)]
-    #[case(String::from("zoneight234"), 14)]
-    #[case(String::from("7pqrstsixteen"), 76)]
+    #[case("1abc2", 12)]
+    #[case("treb7uchet", 77)]
+    #[case("two1", 21)]
+    #[case("two1nine", 29)]
+    #[case("eightwothree", 83)]
+    #[case("abcone2threexyz", 13)]
+    #[case("xtwone3four", 24)]
+    #[case("4nineeightseven2", 42)]
+    #[case("zoneight234", 14)]
+    #[case("7pqrstsixteen", 76)]
     fn extracts_calibration_value_of_a_single_line(#[case] line: String, #[case] expected: u32) {
         let mut calibration_value_extractor = CalibrationValueExtractor::new(vec![line]);
 
