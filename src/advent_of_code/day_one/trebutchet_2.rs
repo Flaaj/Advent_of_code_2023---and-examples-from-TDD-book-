@@ -39,8 +39,25 @@ impl CalibrationValueExtractor {
         Self { lines, value: 0 }
     }
 
+    fn replace_digit_names_with_digits(line: &String) -> String {
+        line.replace("one", "one1one")
+            .replace("two", "two2two")
+            .replace("three", "three3three")
+            .replace("four", "four4four")
+            .replace("five", "five5five")
+            .replace("six", "six6six")
+            .replace("seven", "seven7seven")
+            .replace("eight", "eight8eight")
+            .replace("nine", "nine9nine")
+    }
+
+    // fn get_digits_from_line(line: &String) -> Vec<u32> {
+    //     let digits: Vec<u32> = Vec::new();
+    //     digits
+    // }
+
     fn extract_single_line_value(line: &String) -> u32 {
-        let digits: Vec<u32> = line
+        let digits: Vec<u32> = Self::replace_digit_names_with_digits(line)
             .chars()
             .map(|c| c.to_digit(10))
             .filter(|c| c.is_some())
@@ -67,7 +84,7 @@ impl CalibrationValueExtractor {
 mod tests {
     use rstest::rstest;
 
-    use crate::advent_of_code::day_one::trebutchet::LineReader;
+    use crate::advent_of_code::day_one::trebutchet_2::LineReader;
 
     use super::CalibrationValueExtractor;
 
@@ -81,9 +98,25 @@ mod tests {
 
         assert_eq!(line_reader.get_lines(), vec![line]);
     }
+
+    // #[test]
+    // fn extracts_all_digits_from_line() {
+    //     let digits = CalibrationValueExtractor::get_digits_from_line(&String::from("xtwone3four"));
+
+    //     assert_eq!(digits, [2, 1, 3, 4])
+    // }
+
     #[rstest]
     #[case(String::from("1abc2"), 12)]
     #[case(String::from("treb7uchet"), 77)]
+    #[case(String::from("two1"), 21)]
+    #[case(String::from("two1nine"), 29)]
+    #[case(String::from("eightwothree"), 83)]
+    #[case(String::from("abcone2threexyz"), 13)]
+    #[case(String::from("xtwone3four"), 24)]
+    #[case(String::from("4nineeightseven2"), 42)]
+    #[case(String::from("zoneight234"), 14)]
+    #[case(String::from("7pqrstsixteen"), 76)]
     fn extracts_calibration_value_of_a_single_line(#[case] line: String, #[case] expected: u32) {
         let mut calibration_value_extractor = CalibrationValueExtractor::new(vec![line]);
 
@@ -111,7 +144,7 @@ mod tests {
     fn reads_lines_from_file() {
         let mut line_reader = LineReader::new();
 
-        line_reader.read_lines_from_file("./src/advent_of_code/day_one/test-input.txt");
+        line_reader.read_lines_from_file("./src/advent_of_code/day_two/test-input.txt");
 
         assert_eq!(
             line_reader.get_lines(),

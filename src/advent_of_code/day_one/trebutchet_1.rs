@@ -67,7 +67,7 @@ impl CalibrationValueExtractor {
 mod tests {
     use rstest::rstest;
 
-    use crate::advent_of_code::day_two::trebutchet::LineReader;
+    use crate::advent_of_code::day_one::trebutchet_1::LineReader;
 
     use super::CalibrationValueExtractor;
 
@@ -84,13 +84,6 @@ mod tests {
     #[rstest]
     #[case(String::from("1abc2"), 12)]
     #[case(String::from("treb7uchet"), 77)]
-    #[case(String::from("two1nine"), 29)]
-    #[case(String::from("eightwothree"), 83)]
-    #[case(String::from("abcone2threexyz"), 13)]
-    #[case(String::from("xtwone3four"), 24)]
-    #[case(String::from("4nineeightseven2"), 42)]
-    #[case(String::from("zoneight234"), 14)]
-    #[case(String::from("7pqrstsixteen"), 76)]
     fn extracts_calibration_value_of_a_single_line(#[case] line: String, #[case] expected: u32) {
         let mut calibration_value_extractor = CalibrationValueExtractor::new(vec![line]);
 
@@ -118,7 +111,7 @@ mod tests {
     fn reads_lines_from_file() {
         let mut line_reader = LineReader::new();
 
-        line_reader.read_lines_from_file("./src/advent_of_code/day_two/test-input.txt");
+        line_reader.read_lines_from_file("./src/advent_of_code/day_one/test-input.txt");
 
         assert_eq!(
             line_reader.get_lines(),
