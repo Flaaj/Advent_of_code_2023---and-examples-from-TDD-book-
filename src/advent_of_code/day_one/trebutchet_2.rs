@@ -40,21 +40,21 @@ impl CalibrationValueExtractor {
     }
 
     fn replace_digit_names_with_digits(line: &String) -> String {
-        line.replace("one", "one1one")
-            .replace("two", "two2two")
-            .replace("three", "three3three")
-            .replace("four", "four4four")
-            .replace("five", "five5five")
-            .replace("six", "six6six")
-            .replace("seven", "seven7seven")
-            .replace("eight", "eight8eight")
-            .replace("nine", "nine9nine")
+        // very ugly:
+        line.replace("one", "o1e")
+            .replace("two", "t2o")
+            .replace("three", "t3e")
+            .replace("four", "f4r")
+            .replace("five", "f5e")
+            .replace("six", "s6x")
+            .replace("seven", "s7n")
+            .replace("eight", "e8t")
+            .replace("nine", "n9e")
     }
 
-    // fn get_digits_from_line(line: &String) -> Vec<u32> {
-    //     let digits: Vec<u32> = Vec::new();
-    //     digits
-    // }
+    fn get_digits_from_line(line: &String) -> Vec<u32> {
+        todo!()
+    }
 
     fn extract_single_line_value(line: &String) -> u32 {
         let digits: Vec<u32> = Self::replace_digit_names_with_digits(line)
@@ -99,12 +99,12 @@ mod tests {
         assert_eq!(line_reader.get_lines(), vec![line]);
     }
 
-    // #[test]
-    // fn extracts_all_digits_from_line() {
-    //     let digits = CalibrationValueExtractor::get_digits_from_line(&String::from("xtwone3four"));
+    #[test]
+    fn extracts_all_digits_from_line() {
+        let digits = CalibrationValueExtractor::get_digits_from_line(&String::from("xtwone3four"));
 
-    //     assert_eq!(digits, [2, 1, 3, 4])
-    // }
+        assert_eq!(digits, [2, 1, 3, 4])
+    }
 
     #[rstest]
     #[case(String::from("1abc2"), 12)]
@@ -144,7 +144,7 @@ mod tests {
     fn reads_lines_from_file() {
         let mut line_reader = LineReader::new();
 
-        line_reader.read_lines_from_file("./src/advent_of_code/day_two/test-input.txt");
+        line_reader.read_lines_from_file("./src/advent_of_code/day_one/test-input.txt");
 
         assert_eq!(
             line_reader.get_lines(),
