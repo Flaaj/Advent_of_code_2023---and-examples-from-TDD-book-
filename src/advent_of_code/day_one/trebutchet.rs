@@ -54,7 +54,7 @@ impl CalibrationValueExtractor {
 
     pub fn extract_value(&mut self) {
         for line in self.lines.iter() {
-            self.value += CalibrationValueExtractor::extract_single_line_value(line)
+            self.value += Self::extract_single_line_value(line)
         }
     }
 

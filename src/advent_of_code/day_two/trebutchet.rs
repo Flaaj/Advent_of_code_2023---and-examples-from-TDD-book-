@@ -54,7 +54,7 @@ impl CalibrationValueExtractor {
 
     pub fn extract_value(&mut self) {
         for line in self.lines.iter() {
-            self.value += CalibrationValueExtractor::extract_single_line_value(line)
+            self.value += Self::extract_single_line_value(line)
         }
     }
 
@@ -84,6 +84,13 @@ mod tests {
     #[rstest]
     #[case(String::from("1abc2"), 12)]
     #[case(String::from("treb7uchet"), 77)]
+    #[case(String::from("two1nine"), 29)]
+    #[case(String::from("eightwothree"), 83)]
+    #[case(String::from("abcone2threexyz"), 13)]
+    #[case(String::from("xtwone3four"), 24)]
+    #[case(String::from("4nineeightseven2"), 42)]
+    #[case(String::from("zoneight234"), 14)]
+    #[case(String::from("7pqrstsixteen"), 76)]
     fn extracts_calibration_value_of_a_single_line(#[case] line: String, #[case] expected: u32) {
         let mut calibration_value_extractor = CalibrationValueExtractor::new(vec![line]);
 
