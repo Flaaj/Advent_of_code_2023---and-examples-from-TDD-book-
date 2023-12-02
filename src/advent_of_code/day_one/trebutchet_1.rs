@@ -54,7 +54,7 @@ impl CalibrationValueExtractor {
 
     pub fn extract_value(&mut self) {
         for line in self.lines.iter() {
-            self.value += CalibrationValueExtractor::extract_single_line_value(line)
+            self.value += Self::extract_single_line_value(line)
         }
     }
 
@@ -67,7 +67,7 @@ impl CalibrationValueExtractor {
 mod tests {
     use rstest::rstest;
 
-    use crate::advent_of_code::day_one::trebutchet::LineReader;
+    use crate::advent_of_code::day_one::trebutchet_1::LineReader;
 
     use super::CalibrationValueExtractor;
 
