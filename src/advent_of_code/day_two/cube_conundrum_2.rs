@@ -184,24 +184,33 @@ impl GamePowerCalculator {
         Self {}
     }
 
+    fn get_minimum_needed_cube_counts_of_each_color<'a>(
+        hashmap: &mut HashMap<&'a String, u32>,
+        set: &'a Vec<Cubes>,
+    ) {
+        set.iter().for_each(move |cubes| {
+            let current = match hashmap.get(&cubes.color) {
+                Some(&count) => count,
+                None => 0,
+            };
+            if cubes.count > current {
+                hashmap.insert(&cubes.color, cubes.count);
+            };
+        })
+    }
+
+    fn get_game_power(game: &Game) -> u32 {
+        let hashmap = &mut HashMap::<&String, u32>::new();
+        game.sets
+            .iter()
+            .for_each(|set| Self::get_minimum_needed_cube_counts_of_each_color(hashmap, set));
+        hashmap.values().fold(1, |acc, val| acc * val)
+    }
+
     fn get_sum_of_game_powers(&self, games: Vec<Game>) -> u32 {
         games
             .iter()
-            .map(|game| {
-                let mut hashmap: HashMap<&String, u32> = HashMap::new();
-                game.sets.iter().for_each(|set| {
-                    set.iter().for_each(|cubes| {
-                        let current = match hashmap.get(&cubes.color) {
-                            Some(count) => count,
-                            None => &0u32,
-                        };
-                        if cubes.count > *current {
-                            hashmap.insert(&cubes.color, cubes.count);
-                        };
-                    })
-                });
-                hashmap.values().fold(1, |acc, val| acc * val)
-            })
+            .map(|game| Self::get_game_power(game))
             .fold(0, |acc, val| acc + val)
     }
 }
