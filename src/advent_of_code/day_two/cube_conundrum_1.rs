@@ -199,7 +199,7 @@ impl CubeConundrum {
         self.game_parser.parse_games(self.line_reader.get_lines());
     }
 
-    pub fn insert_cubes_into_sac(&mut self, count: u32, color: &str) {
+    pub fn insert_cubes_into_bag(&mut self, count: u32, color: &str) {
         self.bag.insert_cubes(count, color.to_owned());
     }
 
@@ -371,9 +371,9 @@ mod test {
     fn calculates_sum_of_valid_game_ids() {
         let mut cube_conundrum = CubeConundrum::new();
         cube_conundrum.read_games_from_file("./src/advent_of_code/day_two/test-input.txt");
-        cube_conundrum.insert_cubes_into_sac(12, "red");
-        cube_conundrum.insert_cubes_into_sac(13, "green");
-        cube_conundrum.insert_cubes_into_sac(14, "blue");
+        cube_conundrum.insert_cubes_into_bag(12, "red");
+        cube_conundrum.insert_cubes_into_bag(13, "green");
+        cube_conundrum.insert_cubes_into_bag(14, "blue");
 
         let sum = cube_conundrum.get_sum_of_valid_game_ids();
 
