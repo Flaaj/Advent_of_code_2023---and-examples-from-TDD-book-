@@ -1,34 +1,5 @@
 use std::fs::read_to_string;
 
-pub struct LineReader {
-    lines: Vec<String>,
-}
-
-impl LineReader {
-    pub fn new() -> Self {
-        Self { lines: vec![] }
-    }
-
-    fn add_line(&mut self, line: String) {
-        self.lines.push(line)
-    }
-
-    pub fn read_lines_from_file(&mut self, filename: &str) {
-        match read_to_string(filename) {
-            Err(err) => println!("{}", err),
-            Ok(open_file) => {
-                for line in open_file.lines() {
-                    self.add_line(line.to_string());
-                }
-            }
-        }
-    }
-
-    pub fn get_lines(self) -> Vec<String> {
-        self.lines
-    }
-}
-
 pub struct CalibrationValueExtractor {
     lines: Vec<String>,
     value: u32,
@@ -81,7 +52,9 @@ impl CalibrationValueExtractor {
 mod tests {
     use rstest::rstest;
 
-    use crate::advent_of_code::day_one::trebutchet_2::{CalibrationValueExtractor, LineReader};
+    use crate::advent_of_code::day_one::{
+        line_reader::LineReader, trebutchet_2::CalibrationValueExtractor,
+    };
 
     #[rstest]
     #[case("1abc2")]
