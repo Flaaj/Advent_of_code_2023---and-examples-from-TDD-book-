@@ -32,8 +32,8 @@ use super::line_reader::LineReader;
 
 #[derive(PartialEq, Debug, Clone)]
 struct Cubes {
-    pub color: String,
-    pub count: u32,
+    color: String,
+    count: u32,
 }
 
 #[derive(PartialEq, Debug, Clone)]
@@ -52,7 +52,7 @@ struct GameParser {
 }
 
 impl GameParser {
-    pub fn new() -> Self {
+    fn new() -> Self {
         Self { games: vec![] }
     }
 
@@ -113,13 +113,13 @@ impl GameParser {
         }
     }
 
-    pub fn parse_games(&mut self, lines: Vec<String>) {
+    fn parse_games(&mut self, lines: Vec<String>) {
         for line in lines {
             self.parse_line(line);
         }
     }
 
-    pub fn get_games(&self) -> Vec<Game> {
+    fn get_games(&self) -> Vec<Game> {
         self.games.clone()
     }
 }
@@ -129,17 +129,17 @@ struct Bag {
 }
 
 impl Bag {
-    pub fn new() -> Self {
+    fn new() -> Self {
         Self {
             cubes_count_by_color: HashMap::new(),
         }
     }
 
-    pub fn insert_cubes(&mut self, count: u32, color: String) {
+    fn insert_cubes(&mut self, count: u32, color: String) {
         self.cubes_count_by_color.insert(color, count);
     }
 
-    pub fn get_cubes_count_by_color(&self, color: &String) -> u32 {
+    fn get_cubes_count_by_color(&self, color: &String) -> u32 {
         match self.cubes_count_by_color.get(color) {
             None => 0,
             Some(&count) => count,
@@ -150,7 +150,7 @@ impl Bag {
 struct GameValidator {}
 
 impl GameValidator {
-    pub fn new() -> Self {
+    fn new() -> Self {
         Self {}
     }
 
@@ -167,7 +167,7 @@ impl GameValidator {
         game.sets.iter().all(|set| Self::validate_set(bag, set))
     }
 
-    pub fn get_sum_of_valid_game_ids(&self, bag: &Bag, games: Vec<Game>) -> u32 {
+    fn get_sum_of_valid_game_ids(&self, bag: &Bag, games: Vec<Game>) -> u32 {
         games.iter().fold(0, |acc, game| {
             acc + match Self::validate_game(bag, &game) {
                 true => game.id,
@@ -177,10 +177,40 @@ impl GameValidator {
     }
 }
 
+struct GamePowerCalculator {}
+
+impl GamePowerCalculator {
+    fn new() -> Self {
+        Self {}
+    }
+
+    fn get_sum_of_game_powers(&self, games: Vec<Game>) -> u32 {
+        games
+            .iter()
+            .map(|game| {
+                let mut hashmap: HashMap<&String, u32> = HashMap::new();
+                game.sets.iter().for_each(|set| {
+                    set.iter().for_each(|cubes| {
+                        let current = match hashmap.get(&cubes.color) {
+                            Some(count) => count,
+                            None => &0u32,
+                        };
+                        if cubes.count > *current {
+                            hashmap.insert(&cubes.color, cubes.count);
+                        };
+                    })
+                });
+                hashmap.values().fold(1, |acc, val| acc * val)
+            })
+            .fold(0, |acc, val| acc + val)
+    }
+}
+
 pub struct CubeConundrum {
     line_reader: LineReader,
     game_parser: GameParser,
     game_validator: GameValidator,
+    game_power_calculator: GamePowerCalculator,
     bag: Bag,
 }
 
@@ -188,9 +218,10 @@ impl CubeConundrum {
     pub fn new() -> Self {
         Self {
             line_reader: LineReader::new(),
-            bag: Bag::new(),
             game_parser: GameParser::new(),
             game_validator: GameValidator::new(),
+            game_power_calculator: GamePowerCalculator::new(),
+            bag: Bag::new(),
         }
     }
 
@@ -209,7 +240,8 @@ impl CubeConundrum {
     }
 
     pub fn get_sum_of_game_powers(&self) -> u32 {
-        0
+        self.game_power_calculator
+            .get_sum_of_game_powers(self.game_parser.get_games())
     }
 }
 
@@ -387,9 +419,6 @@ mod test {
     fn calculates_sum_of_game_powers() {
         let mut cube_conundrum = CubeConundrum::new();
         cube_conundrum.read_games_from_file("./src/advent_of_code/day_two/test-input.txt");
-        cube_conundrum.insert_cubes_into_bag(12, "red");
-        cube_conundrum.insert_cubes_into_bag(13, "green");
-        cube_conundrum.insert_cubes_into_bag(14, "blue");
 
         let sum = cube_conundrum.get_sum_of_game_powers();
 

@@ -11,7 +11,9 @@ fn main() {
     cube_conundrum.insert_cubes_into_bag(13, "green");
     cube_conundrum.insert_cubes_into_bag(14, "blue");
 
-    let sum = cube_conundrum.get_sum_of_valid_game_ids();
+    let sum_of_ids = cube_conundrum.get_sum_of_valid_game_ids();
+    let sum_of_powers = cube_conundrum.get_sum_of_game_powers();
 
-    println!("{}", sum)
+    println!("Sum of ids: {}", sum_of_ids);
+    println!("Sum of powers: {}", sum_of_powers);
 }
