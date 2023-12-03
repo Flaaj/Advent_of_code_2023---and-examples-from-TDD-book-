@@ -53,12 +53,12 @@ impl CalibrationValueExtractor {
     }
 
     fn extract_single_line_value(line: &String) -> u32 {
-        let digits: Vec<u32> = Self::replace_digit_names_with_digits(line)
+        let digits = Self::replace_digit_names_with_digits(line)
             .chars()
             .map(|c| c.to_digit(10))
             .filter(|c| c.is_some())
             .map(|c| c.unwrap())
-            .collect();
+            .collect::<Vec<u32>>();
         match digits.len() {
             0 => 0,
             len => 10 * digits.get(0).unwrap() + digits.get(len - 1).unwrap(),
@@ -66,6 +66,7 @@ impl CalibrationValueExtractor {
     }
 
     pub fn extract_value(&mut self) {
+        self.value = 0;
         for line in self.lines.iter() {
             self.value += Self::extract_single_line_value(line)
         }
@@ -80,9 +81,7 @@ impl CalibrationValueExtractor {
 mod tests {
     use rstest::rstest;
 
-    use crate::advent_of_code::day_one::trebutchet_2::LineReader;
-
-    use super::CalibrationValueExtractor;
+    use crate::advent_of_code::day_one::trebutchet_2::{CalibrationValueExtractor, LineReader};
 
     #[rstest]
     #[case("1abc2")]

@@ -67,9 +67,7 @@ impl CalibrationValueExtractor {
 mod tests {
     use rstest::rstest;
 
-    use crate::advent_of_code::day_one::trebutchet_1::LineReader;
-
-    use super::CalibrationValueExtractor;
+    use crate::advent_of_code::day_one::trebutchet_1::{CalibrationValueExtractor, LineReader};
 
     #[rstest]
     #[case(String::from("1abc2"))]
