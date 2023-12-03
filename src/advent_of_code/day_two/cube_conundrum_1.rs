@@ -43,11 +43,11 @@ lazy_static! {
         Regex::new(r"^Game \d+: ((\d+ [a-zA-Z]+[;,] )?+(\d+ [a-zA-Z]+)?)$").unwrap();
 }
 
-struct GameExtractor {
+struct GameParser {
     games: Vec<Game>,
 }
 
-impl GameExtractor {
+impl GameParser {
     pub fn new() -> Self {
         Self { games: vec![] }
     }
@@ -131,19 +131,19 @@ mod test {
     use rstest::rstest;
 
     use crate::advent_of_code::day_two::cube_conundrum_1::{
-        Cubes, Game, GameExtractor, GameValidator, Sac,
+        Cubes, Game, GameParser, GameValidator, Sac,
     };
 
     #[test]
     fn extracts_game_data_from_input_line_case_1() {
-        let mut game_extractor = GameExtractor::new();
+        let mut game_parser = GameParser::new();
 
-        game_extractor.parse_line(String::from(
+        game_parser.parse_line(String::from(
             "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green",
         ));
 
         assert_eq!(
-            game_extractor.get_games(),
+            game_parser.get_games(),
             vec![Game {
                 id: 1,
                 sets: vec![
@@ -182,14 +182,14 @@ mod test {
 
     #[test]
     fn extracts_game_data_from_input_line_case_2() {
-        let mut game_extractor = GameExtractor::new();
+        let mut game_parser = GameParser::new();
 
-        game_extractor.parse_line(String::from(
+        game_parser.parse_line(String::from(
             "Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red",
         ));
 
         assert_eq!(
-            game_extractor.get_games(),
+            game_parser.get_games(),
             vec![Game {
                 id: 3,
                 sets: vec![
@@ -241,13 +241,13 @@ mod test {
     #[case("Game 2: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red")]
     #[case("Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green")]
     #[case("Game 4: 8 green")]
-    #[case("Game 5: 8 green, 8 green, 8 green, 8 green, 8 green, 8 green, 8 green, 8 green, 8 green, 8 green, 8 green, 8 green")]
+    #[case("Game 5: 562691234 green, 562655 red, 8124124 blue")]
     fn parses_correct_lines(#[case] line: String) {
-        let mut game_extractor = GameExtractor::new();
+        let mut game_parser = GameParser::new();
 
-        game_extractor.parse_line(line);
+        game_parser.parse_line(line);
 
-        assert_eq!(game_extractor.get_games().len(), 1);
+        assert_eq!(game_parser.get_games().len(), 1);
     }
 
     #[rstest]
@@ -257,11 +257,11 @@ mod test {
     #[case("Game 1 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green")]
     #[case("3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red")]
     fn doesnt_parse_incorrect_lines(#[case] line: String) {
-        let mut game_extractor = GameExtractor::new();
+        let mut game_parser = GameParser::new();
 
-        game_extractor.parse_line(line);
+        game_parser.parse_line(line);
 
-        assert_eq!(game_extractor.get_games().len(), 0);
+        assert_eq!(game_parser.get_games().len(), 0);
     }
 
     #[rstest]
@@ -274,9 +274,9 @@ mod test {
         sac.add_cubes(10, "red");
         sac.add_cubes(10, "green");
         sac.add_cubes(10, "blue");
-        let mut game_extractor = GameExtractor::new();
-        game_extractor.parse_line(line);
-        let games = game_extractor.get_games();
+        let mut game_parser = GameParser::new();
+        game_parser.parse_line(line);
+        let games = game_parser.get_games();
         let game = games.get(0).unwrap();
 
         let is_valid = GameValidator::validate_single_game(&sac, game);
