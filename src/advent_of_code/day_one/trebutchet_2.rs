@@ -110,7 +110,7 @@ mod tests {
 
         calibration_value_extractor.extract_value();
 
-        assert_eq!(calibration_value_extractor.get_value(), expected)
+        assert_eq!(calibration_value_extractor.get_value(), expected);
     }
 
     #[test]
@@ -125,7 +125,7 @@ mod tests {
 
         calibration_value_extractor.extract_value();
 
-        assert_eq!(calibration_value_extractor.get_value(), 142)
+        assert_eq!(calibration_value_extractor.get_value(), 142);
     }
 
     #[test]
