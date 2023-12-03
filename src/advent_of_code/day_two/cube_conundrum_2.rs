@@ -95,10 +95,10 @@ impl GameParser {
     }
 
     fn parse_game(game_str: &str) -> Game {
-        let split_line: Vec<&str> = game_str.split(": ").collect();
+        let split_game_str: Vec<&str> = game_str.split(": ").collect();
 
-        let meta_str = split_line.get(0).unwrap();
-        let sets_str = split_line.get(1).unwrap();
+        let meta_str = split_game_str.get(0).unwrap();
+        let sets_str = split_game_str.get(1).unwrap();
 
         let id = Self::parse_id(meta_str);
         let sets = Self::parse_sets(sets_str);
@@ -184,7 +184,7 @@ impl GamePowerCalculator {
         Self {}
     }
 
-    fn get_minimum_needed_cube_counts_of_each_color<'a>(
+    fn set_minimum_needed_cube_counts_of_each_color<'a>(
         hashmap: &mut HashMap<&'a String, u32>,
         set: &'a Vec<Cubes>,
     ) {
@@ -203,7 +203,7 @@ impl GamePowerCalculator {
         let hashmap = &mut HashMap::<&String, u32>::new();
         game.sets
             .iter()
-            .for_each(|set| Self::get_minimum_needed_cube_counts_of_each_color(hashmap, set));
+            .for_each(|set| Self::set_minimum_needed_cube_counts_of_each_color(hashmap, set));
         hashmap.values().fold(1, |acc, val| acc * val)
     }
 
