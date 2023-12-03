@@ -1,34 +1,5 @@
 use std::fs::read_to_string;
 
-pub struct LineReader {
-    lines: Vec<String>,
-}
-
-impl LineReader {
-    pub fn new() -> Self {
-        Self { lines: vec![] }
-    }
-
-    fn add_line(&mut self, line: String) {
-        self.lines.push(line)
-    }
-
-    pub fn read_lines_from_file(&mut self, filename: &str) {
-        match read_to_string(filename) {
-            Err(err) => println!("{}", err),
-            Ok(open_file) => {
-                for line in open_file.lines() {
-                    self.add_line(line.to_string());
-                }
-            }
-        }
-    }
-
-    pub fn get_lines(self) -> Vec<String> {
-        self.lines
-    }
-}
-
 pub struct CalibrationValueExtractor {
     lines: Vec<String>,
     value: u32,
@@ -53,12 +24,12 @@ impl CalibrationValueExtractor {
     }
 
     fn extract_single_line_value(line: &String) -> u32 {
-        let digits: Vec<u32> = Self::replace_digit_names_with_digits(line)
+        let digits = Self::replace_digit_names_with_digits(line)
             .chars()
             .map(|c| c.to_digit(10))
             .filter(|c| c.is_some())
             .map(|c| c.unwrap())
-            .collect();
+            .collect::<Vec<u32>>();
         match digits.len() {
             0 => 0,
             len => 10 * digits.get(0).unwrap() + digits.get(len - 1).unwrap(),
@@ -66,6 +37,7 @@ impl CalibrationValueExtractor {
     }
 
     pub fn extract_value(&mut self) {
+        self.value = 0;
         for line in self.lines.iter() {
             self.value += Self::extract_single_line_value(line)
         }
@@ -80,9 +52,9 @@ impl CalibrationValueExtractor {
 mod tests {
     use rstest::rstest;
 
-    use crate::advent_of_code::day_one::trebutchet_2::LineReader;
-
-    use super::CalibrationValueExtractor;
+    use crate::advent_of_code::day_one::{
+        line_reader::LineReader, trebutchet_2::CalibrationValueExtractor,
+    };
 
     #[rstest]
     #[case("1abc2")]
@@ -111,7 +83,7 @@ mod tests {
 
         calibration_value_extractor.extract_value();
 
-        assert_eq!(calibration_value_extractor.get_value(), expected)
+        assert_eq!(calibration_value_extractor.get_value(), expected);
     }
 
     #[test]
@@ -126,7 +98,7 @@ mod tests {
 
         calibration_value_extractor.extract_value();
 
-        assert_eq!(calibration_value_extractor.get_value(), 142)
+        assert_eq!(calibration_value_extractor.get_value(), 142);
     }
 
     #[test]

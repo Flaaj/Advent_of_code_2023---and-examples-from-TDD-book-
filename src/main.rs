@@ -1,15 +1,19 @@
-use advent_of_code::day_one::trebutchet_2::{CalibrationValueExtractor, LineReader};
-
 // mod currency;
 // mod codewars;
 mod advent_of_code;
 
+use advent_of_code::day_two::cube_conundrum_2::CubeConundrum;
+
 fn main() {
-    let mut line_reader = LineReader::new();
-    line_reader.read_lines_from_file("./src/advent_of_code/day_two/input.txt");
+    let mut cube_conundrum = CubeConundrum::new();
+    cube_conundrum.read_games_from_file("./src/advent_of_code/day_two/input.txt");
+    cube_conundrum.insert_cubes_into_bag(12, "red");
+    cube_conundrum.insert_cubes_into_bag(13, "green");
+    cube_conundrum.insert_cubes_into_bag(14, "blue");
 
-    let mut calibration_value_extractor = CalibrationValueExtractor::new(line_reader.get_lines());
-    calibration_value_extractor.extract_value();
+    let sum_of_ids = cube_conundrum.get_sum_of_valid_game_ids();
+    let sum_of_powers = cube_conundrum.get_sum_of_game_powers();
 
-    println!("{}", calibration_value_extractor.get_value());
+    println!("Sum of ids: {}", sum_of_ids);
+    println!("Sum of powers: {}", sum_of_powers);
 }
