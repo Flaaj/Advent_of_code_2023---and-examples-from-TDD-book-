@@ -124,11 +124,11 @@ impl GameParser {
     }
 }
 
-struct Sac {
+struct Bag {
     cubes_count_by_color: HashMap<String, u32>,
 }
 
-impl Sac {
+impl Bag {
     pub fn new() -> Self {
         Self {
             cubes_count_by_color: HashMap::new(),
@@ -154,22 +154,22 @@ impl GameValidator {
         Self {}
     }
 
-    fn validate_cubes_of_single_color(sac: &Sac, cubes: &Cubes) -> bool {
-        cubes.count <= sac.get_cubes_count_by_color(&cubes.color)
+    fn validate_cubes_of_single_color(bag: &Bag, cubes: &Cubes) -> bool {
+        cubes.count <= bag.get_cubes_count_by_color(&cubes.color)
     }
 
-    fn validate_set(sac: &Sac, set: &Vec<Cubes>) -> bool {
+    fn validate_set(bag: &Bag, set: &Vec<Cubes>) -> bool {
         set.iter()
-            .all(|cubes| Self::validate_cubes_of_single_color(sac, cubes))
+            .all(|cubes| Self::validate_cubes_of_single_color(bag, cubes))
     }
 
-    fn validate_game(sac: &Sac, game: &Game) -> bool {
-        game.sets.iter().all(|set| Self::validate_set(sac, set))
+    fn validate_game(bag: &Bag, game: &Game) -> bool {
+        game.sets.iter().all(|set| Self::validate_set(bag, set))
     }
 
-    pub fn get_sum_of_valid_game_ids(&self, sac: &Sac, games: Vec<Game>) -> u32 {
+    pub fn get_sum_of_valid_game_ids(&self, bag: &Bag, games: Vec<Game>) -> u32 {
         games.iter().fold(0, |acc, game| {
-            acc + match Self::validate_game(sac, &game) {
+            acc + match Self::validate_game(bag, &game) {
                 true => game.id,
                 false => 0,
             }
@@ -181,14 +181,14 @@ struct CubeConundrum {
     line_reader: LineReader,
     game_parser: GameParser,
     game_validator: GameValidator,
-    sac: Sac,
+    bag: Bag,
 }
 
 impl CubeConundrum {
     pub fn new() -> Self {
         Self {
             line_reader: LineReader::new(),
-            sac: Sac::new(),
+            bag: Bag::new(),
             game_parser: GameParser::new(),
             game_validator: GameValidator::new(),
         }
@@ -200,12 +200,12 @@ impl CubeConundrum {
     }
 
     pub fn insert_cubes_into_sac(&mut self, count: u32, color: &str) {
-        self.sac.insert_cubes(count, color.to_owned());
+        self.bag.insert_cubes(count, color.to_owned());
     }
 
     pub fn get_sum_of_valid_game_ids(&self) -> u32 {
         self.game_validator
-            .get_sum_of_valid_game_ids(&self.sac, self.game_parser.get_games())
+            .get_sum_of_valid_game_ids(&self.bag, self.game_parser.get_games())
     }
 }
 
@@ -214,7 +214,7 @@ mod test {
     use rstest::rstest;
 
     use crate::advent_of_code::day_two::{
-        cube_conundrum_1::{self, CubeConundrum, Cubes, Game, GameParser, GameValidator, Sac},
+        cube_conundrum_1::{self, CubeConundrum, Cubes, Game, GameParser, GameValidator, Bag},
         line_reader::LineReader,
     };
 
@@ -353,16 +353,16 @@ mod test {
     #[case("Game 3: 12 green, 8 red, 9 blue", false)]
     #[case("Game 2: 12 green", false)]
     fn validates_single_game_correctly(#[case] line: String, #[case] should_be_valid: bool) {
-        let mut sac = Sac::new();
-        sac.insert_cubes(10, String::from("red"));
-        sac.insert_cubes(10, String::from("green"));
-        sac.insert_cubes(10, String::from("blue"));
+        let mut bag = Bag::new();
+        bag.insert_cubes(10, String::from("red"));
+        bag.insert_cubes(10, String::from("green"));
+        bag.insert_cubes(10, String::from("blue"));
         let mut game_parser = GameParser::new();
         game_parser.parse_line(line);
         let games = game_parser.get_games();
         let game = games.get(0).unwrap();
 
-        let is_valid = GameValidator::validate_game(&sac, game);
+        let is_valid = GameValidator::validate_game(&bag, game);
 
         assert_eq!(is_valid, should_be_valid)
     }
