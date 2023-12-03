@@ -47,13 +47,11 @@ lazy_static! {
         Regex::new(r"^Game \d+: (\d+ [a-z]+[;,] )?+(\d+ [a-z]+)$").unwrap();
 }
 
-struct GameParser {
-    games: Vec<Game>,
-}
+struct GameParser {}
 
 impl GameParser {
     fn new() -> Self {
-        Self { games: vec![] }
+        Self {}
     }
 
     fn validate_game_string(line: &String) -> Result<&String, &str> {
@@ -106,21 +104,25 @@ impl GameParser {
         Game { id, sets }
     }
 
-    fn parse_line(&mut self, line: String) {
+    fn parse_line(&mut self, line: String) -> Option<Game> {
         match Self::validate_game_string(&line) {
-            Err(err) => println!("{}", err),
-            Ok(game_str) => self.games.push(Self::parse_game(game_str)),
+            Err(err) => {
+                eprintln!("{}", err);
+                None
+            }
+            Ok(game_str) => Some(Self::parse_game(game_str)),
         }
     }
 
-    fn parse_games(&mut self, lines: Vec<String>) {
+    fn parse_games(&mut self, lines: Vec<String>) -> Vec<Game> {
+        let mut games = vec![];
         for line in lines {
-            self.parse_line(line);
+            match self.parse_line(line) {
+                None => (),
+                Some(game) => games.push(game),
+            }
         }
-    }
-
-    fn get_games(&self) -> Vec<Game> {
-        self.games.clone()
+        games
     }
 }
 
@@ -167,7 +169,7 @@ impl GameValidator {
         game.sets.iter().all(|set| Self::validate_set(bag, set))
     }
 
-    fn get_sum_of_valid_game_ids(&self, bag: &Bag, games: Vec<Game>) -> u32 {
+    fn get_sum_of_valid_game_ids(&self, bag: &Bag, games: &Vec<Game>) -> u32 {
         games.iter().fold(0, |acc, game| {
             acc + match Self::validate_game(bag, &game) {
                 true => game.id,
@@ -207,7 +209,7 @@ impl GamePowerCalculator {
         hashmap.values().fold(1, |acc, val| acc * val)
     }
 
-    fn get_sum_of_game_powers(&self, games: Vec<Game>) -> u32 {
+    fn get_sum_of_game_powers(&self, games: &Vec<Game>) -> u32 {
         games
             .iter()
             .map(|game| Self::get_game_power(game))
@@ -221,6 +223,7 @@ pub struct CubeConundrum {
     game_validator: GameValidator,
     game_power_calculator: GamePowerCalculator,
     bag: Bag,
+    games: Vec<Game>,
 }
 
 impl CubeConundrum {
@@ -231,12 +234,14 @@ impl CubeConundrum {
             game_validator: GameValidator::new(),
             game_power_calculator: GamePowerCalculator::new(),
             bag: Bag::new(),
+            games: vec![],
         }
     }
 
     pub fn read_games_from_file(&mut self, filename: &str) {
         let lines = self.line_reader.read_lines_from_file(filename);
-        self.game_parser.parse_games(lines);
+        let games = self.game_parser.parse_games(lines);
+        self.games = games
     }
 
     pub fn insert_cubes_into_bag(&mut self, count: u32, color: &str) {
@@ -245,12 +250,12 @@ impl CubeConundrum {
 
     pub fn get_sum_of_valid_game_ids(&self) -> u32 {
         self.game_validator
-            .get_sum_of_valid_game_ids(&self.bag, self.game_parser.get_games())
+            .get_sum_of_valid_game_ids(&self.bag, &self.games)
     }
 
     pub fn get_sum_of_game_powers(&self) -> u32 {
         self.game_power_calculator
-            .get_sum_of_game_powers(self.game_parser.get_games())
+            .get_sum_of_game_powers(&self.games)
     }
 }
 
@@ -266,13 +271,15 @@ mod test {
     fn extracts_game_from_input_line_case_1() {
         let mut game_parser = GameParser::new();
 
-        game_parser.parse_line(String::from(
-            "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green",
-        ));
+        let game = game_parser
+            .parse_line(String::from(
+                "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green",
+            ))
+            .unwrap();
 
         assert_eq!(
-            game_parser.get_games(),
-            vec![Game {
+            game,
+            Game {
                 id: 1,
                 sets: vec![
                     vec![
@@ -304,7 +311,7 @@ mod test {
                         count: 2
                     },]
                 ]
-            }]
+            }
         )
     }
 
@@ -312,13 +319,15 @@ mod test {
     fn extracts_game_from_input_line_case_2() {
         let mut game_parser = GameParser::new();
 
-        game_parser.parse_line(String::from(
-            "Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red",
-        ));
+        let game = game_parser
+            .parse_line(String::from(
+                "Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red",
+            ))
+            .unwrap();
 
         assert_eq!(
-            game_parser.get_games(),
-            vec![Game {
+            game,
+            Game {
                 id: 3,
                 sets: vec![
                     vec![
@@ -360,7 +369,7 @@ mod test {
                         },
                     ]
                 ]
-            }]
+            }
         )
     }
 
@@ -373,9 +382,9 @@ mod test {
     fn parses_correct_lines(#[case] line: String) {
         let mut game_parser = GameParser::new();
 
-        game_parser.parse_line(line);
+        let game = game_parser.parse_line(line);
 
-        assert_eq!(game_parser.get_games().len(), 1);
+        assert!(game.is_some());
     }
 
     #[rstest]
@@ -386,9 +395,9 @@ mod test {
     fn doesnt_parse_incorrect_lines(#[case] line: String) {
         let mut game_parser = GameParser::new();
 
-        game_parser.parse_line(line);
+        let game = game_parser.parse_line(line);
 
-        assert_eq!(game_parser.get_games().len(), 0);
+        assert!(game.is_none());
     }
 
     #[rstest]
@@ -402,11 +411,9 @@ mod test {
         bag.insert_cubes(10, String::from("green"));
         bag.insert_cubes(10, String::from("blue"));
         let mut game_parser = GameParser::new();
-        game_parser.parse_line(line);
-        let games = game_parser.get_games();
-        let game = games.get(0).unwrap();
+        let game = game_parser.parse_line(line).unwrap();
 
-        let is_valid = GameValidator::validate_game(&bag, game);
+        let is_valid = GameValidator::validate_game(&bag, &game);
 
         assert_eq!(is_valid, should_be_valid)
     }
