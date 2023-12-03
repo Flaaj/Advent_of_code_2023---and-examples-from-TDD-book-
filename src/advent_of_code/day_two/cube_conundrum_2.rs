@@ -207,13 +207,17 @@ impl CubeConundrum {
         self.game_validator
             .get_sum_of_valid_game_ids(&self.bag, self.game_parser.get_games())
     }
+
+    pub fn get_sum_of_game_powers(&self) -> u32 {
+        0
+    }
 }
 
 #[cfg(test)]
 mod test {
     use rstest::rstest;
 
-    use crate::advent_of_code::day_two::cube_conundrum_1::{
+    use crate::advent_of_code::day_two::cube_conundrum_2::{
         Bag, CubeConundrum, Cubes, Game, GameParser, GameValidator,
     };
 
@@ -377,5 +381,18 @@ mod test {
         let sum = cube_conundrum.get_sum_of_valid_game_ids();
 
         assert_eq!(sum, 8);
+    }
+
+    #[test]
+    fn calculates_sum_of_game_powers() {
+        let mut cube_conundrum = CubeConundrum::new();
+        cube_conundrum.read_games_from_file("./src/advent_of_code/day_two/test-input.txt");
+        cube_conundrum.insert_cubes_into_bag(12, "red");
+        cube_conundrum.insert_cubes_into_bag(13, "green");
+        cube_conundrum.insert_cubes_into_bag(14, "blue");
+
+        let sum = cube_conundrum.get_sum_of_game_powers();
+
+        assert_eq!(sum, 2286);
     }
 }
