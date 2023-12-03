@@ -235,8 +235,8 @@ impl CubeConundrum {
     }
 
     pub fn read_games_from_file(&mut self, filename: &str) {
-        self.line_reader.read_lines_from_file(filename);
-        self.game_parser.parse_games(self.line_reader.get_lines());
+        let lines = self.line_reader.read_lines_from_file(filename);
+        self.game_parser.parse_games(lines);
     }
 
     pub fn insert_cubes_into_bag(&mut self, count: u32, color: &str) {

@@ -1,32 +1,23 @@
 use std::fs::read_to_string;
 
-pub struct LineReader {
-    lines: Vec<String>,
-}
+pub struct LineReader {}
 
 impl LineReader {
     pub fn new() -> Self {
-        Self { lines: vec![] }
+        Self {}
     }
 
-    fn add_line(&mut self, line: String) {
-        self.lines.push(line)
-    }
-
-    pub fn read_lines_from_file(&mut self, filename: &str) {
-        self.lines.clear();
+    pub fn read_lines_from_file(&mut self, filename: &str) -> Vec<String> {
+        let mut lines: Vec<String> = vec![];
         match read_to_string(filename) {
             Err(err) => println!("{}", err),
             Ok(open_file) => {
                 for line in open_file.lines() {
-                    self.add_line(line.to_string());
+                    lines.push(line.to_string());
                 }
             }
         }
-    }
-
-    pub fn get_lines(&self) -> Vec<String> {
-        self.lines.clone()
+        lines
     }
 }
 
@@ -38,10 +29,10 @@ mod test {
     fn reads_lines_from_file() {
         let mut line_reader = LineReader::new();
 
-        line_reader.read_lines_from_file("./src/advent_of_code/day_two/test-input.txt");
+        let lines = line_reader.read_lines_from_file("./src/advent_of_code/day_two/test-input.txt");
 
         assert_eq!(
-            line_reader.get_lines(),
+            lines,
             vec![
                 String::from("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green"),
                 String::from("Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue"),
