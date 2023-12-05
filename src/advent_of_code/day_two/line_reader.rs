@@ -8,16 +8,13 @@ impl LineReader {
     }
 
     pub fn read_lines_from_file(&mut self, filename: &str) -> Vec<String> {
-        let mut lines: Vec<String> = vec![];
         match read_to_string(filename) {
-            Err(err) => println!("{}", err),
-            Ok(open_file) => {
-                for line in open_file.lines() {
-                    lines.push(line.to_string());
-                }
+            Err(err) => {
+                eprintln!("{}", err);
+                vec![]
             }
+            Ok(open_file) => open_file.lines().map(|line| String::from(line)).collect(),
         }
-        lines
     }
 }
 
