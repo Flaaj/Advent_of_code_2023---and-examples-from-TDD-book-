@@ -57,7 +57,7 @@ impl GridNumberLocator {
             None => None,
             Some(row) => match row.get(j) {
                 None => None,
-                Some(&c) => match c.is_digit(10) || c.to_string() == String::from(".") {
+                Some(&c) => match c.is_digit(10) || c == '.' {
                     true => None,
                     false => Some((c, i, j)),
                 },
