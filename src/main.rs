@@ -8,7 +8,7 @@ fn main() {
     let mut scratchcards = Scratchcards::new();
     scratchcards.load_from_file("./src/advent_of_code/day_four/input.txt");
 
-    let points = scratchcards.calculate_sum_of_points();
+    let cards = scratchcards.calculate_sum_of_cards();
 
-    assert_eq!(points, 13);
+    println!("{cards}");
 }
