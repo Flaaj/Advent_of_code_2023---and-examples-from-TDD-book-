@@ -1,14 +1,14 @@
-use crate::advent_of_code::day_four::scratchcards::Scratchcards;
+use crate::advent_of_code::day_five::seed_fertilizer::LocationFinder;
 
 // mod currency;
 // mod codewars;
 mod advent_of_code;
 
 fn main() {
-    let mut scratchcards = Scratchcards::new();
-    scratchcards.load_from_file("./src/advent_of_code/day_four/input.txt");
+    let mut location_finder = LocationFinder::new();
+    location_finder.load_mappers_from_file("./src/advent_of_code/day_five/input.txt");
 
-    let cards = scratchcards.calculate_sum_of_cards();
+    let lowers_location_number = location_finder.find_lowest_location_number();
 
-    println!("{cards}");
+    assert_eq!(lowers_location_number, 35);
 }
