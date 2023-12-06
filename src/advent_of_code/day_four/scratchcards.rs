@@ -112,11 +112,11 @@ impl SumOfCardsCalculator {
             let cards_count = hashmap.get(&game.id).unwrap().clone();
             if hits > 0 {
                 (1..(hits + 1)).for_each(|i| {
-                    let new_i = game.id + i as u32;
-                    match hashmap.get(&new_i) {
+                    let game_id = game.id + i as u32;
+                    match hashmap.get(&game_id) {
                         None => (),
                         Some(&current) => {
-                            hashmap.insert(new_i, current + cards_count);
+                            hashmap.insert(game_id, current + cards_count);
                         }
                     };
                 });
