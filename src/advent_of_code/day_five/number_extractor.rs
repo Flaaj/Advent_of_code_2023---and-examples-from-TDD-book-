@@ -5,20 +5,20 @@ impl NumberExtractor {
         Self {}
     }
 
-    pub fn parse_numbers(&self, string: &str) -> Vec<i64> {
+    pub fn parse_numbers(&self, string: &str) -> Vec<u64> {
         let mut digits = String::from("");
-        let mut numbers: Vec<i64> = Vec::new();
+        let mut numbers: Vec<u64> = Vec::new();
         string.chars().for_each(|c| match c.is_digit(10) {
             true => digits.push(c),
             false => {
                 if digits.len() > 0 {
-                    numbers.push(digits.parse::<i64>().unwrap());
+                    numbers.push(digits.parse::<u64>().unwrap());
                     digits = String::from("");
                 }
             }
         });
         if digits.len() > 0 {
-            numbers.push(digits.parse::<i64>().unwrap());
+            numbers.push(digits.parse::<u64>().unwrap());
         }
         numbers
     }

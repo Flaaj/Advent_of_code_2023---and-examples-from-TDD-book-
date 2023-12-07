@@ -1,6 +1,6 @@
 use super::{file_reader::FileReader, number_extractor::NumberExtractor};
 
-type MapperRange = (i64, i64, i64);
+type MapperRange = (u64, u64, u64);
 
 #[derive(Debug, PartialEq)]
 struct Mapper {
@@ -12,8 +12,8 @@ impl Mapper {
         Self { ranges }
     }
 
-    fn map(&self, source: i64) -> i64 {
-        let mut destination: Option<i64> = None;
+    fn map(&self, source: u64) -> u64 {
+        let mut destination: Option<u64> = None;
 
         for &(dest_start, source_start, length) in &self.ranges {
             if source >= source_start && source < source_start + length {
@@ -32,7 +32,7 @@ impl Mapper {
 
 #[derive(Debug, PartialEq)]
 struct MappersChain {
-    seeds: Vec<i64>,
+    seeds: Vec<u64>,
     seed_to_soil_mapper: Mapper,
     soil_to_fertilizer_mapper: Mapper,
     fertilizer_to_water_mapper: Mapper,
@@ -43,7 +43,7 @@ struct MappersChain {
 }
 
 impl MappersChain {
-    fn get_seed_location(&self, seed: i64) -> i64 {
+    fn get_seed_location(&self, seed: u64) -> u64 {
         let soil = self.seed_to_soil_mapper.map(seed);
         let fertilizer = self.soil_to_fertilizer_mapper.map(soil);
         let water = self.fertilizer_to_water_mapper.map(fertilizer);
@@ -54,11 +54,38 @@ impl MappersChain {
         location
     }
 
-    fn get_locations_of_seeds(&self) -> Vec<i64> {
+    fn get_locations_of_seeds(&self) -> Vec<u64> {
         self.seeds
             .iter()
             .map(|&seed| self.get_seed_location(seed))
             .collect()
+    }
+
+    fn get_seed_ranges(&self) -> Vec<u64> {
+        let mut seeds: Vec<u64> = vec![];
+        let ranges_count = &self.seeds.len() / 2;
+
+        for i in 0..ranges_count {
+            let range_start = *self.seeds.get(2 * i).unwrap();
+            let range_length = *self.seeds.get(2 * i + 1).unwrap();
+            let mut range = (range_start..(range_start + range_length)).collect::<Vec<u64>>();
+            seeds.append(&mut range);
+        }
+
+        seeds
+    }
+
+    fn get_locations_of_seed_ranges(&self) -> u64 {
+        let seed_ranges = self.get_seed_ranges();
+        let mut min = 10_000_000_00;
+        for (l, &seed) in seed_ranges.iter().enumerate() {
+            min = min.min(self.get_seed_location(seed));
+        }
+        min
+        // seed_ranges
+        //     .iter()
+        //     .map(|&seed| self.get_seed_location(seed))
+        //     .collect()
     }
 }
 
@@ -76,7 +103,7 @@ impl MapperParser {
     fn parse(&self, string: String) -> MappersChain {
         let mut temp: Vec<MapperRange> = vec![];
 
-        let mut seeds: Vec<i64> = vec![];
+        let mut seeds: Vec<u64> = vec![];
         let mut seed_to_soil_ranges: Vec<MapperRange> = vec![];
         let mut soil_to_fertilizer_ranges: Vec<MapperRange> = vec![];
         let mut fertilizer_to_water_ranges: Vec<MapperRange> = vec![];
@@ -168,18 +195,22 @@ impl LocationFinder {
         self.mappers_chain = Some(mappers_chain);
     }
 
-    pub fn find_lowest_location_number(&self) -> i64 {
+    pub fn find_lowest_location_number_part_one(&self) -> u64 {
         let locations = match &self.mappers_chain {
             None => vec![],
             Some(mappers_chain) => mappers_chain.get_locations_of_seeds(),
         };
 
         if locations.len() == 0 {
-            return -1;
+            return 0;
         }
 
         let initial = *locations.get(0).unwrap();
         locations.iter().fold(initial, |acc, &loc| acc.min(loc))
+    }
+
+    pub fn find_lowest_location_number_part_two(&self) -> u64 {
+        self.mappers_chain.as_ref().unwrap().get_locations_of_seed_ranges()
     }
 }
 
@@ -202,7 +233,7 @@ mod test {
     #[case(60, 62)]
     #[case(97, 99)]
     #[case(100, 100)]
-    fn maps_input_to_output(#[case] source: i64, #[case] expected_destination: i64) {
+    fn maps_input_to_output(#[case] source: u64, #[case] expected_destination: u64) {
         let mapper = Mapper::new(vec![(50, 98, 2), (52, 50, 48)]);
 
         let destination = mapper.map(source);
@@ -255,12 +286,22 @@ mod test {
     }
 
     #[test]
-    fn gets_lowest_location_number_from_input_file() {
+    fn gets_lowest_location_number_from_input_file_part_one() {
         let mut location_finder = LocationFinder::new();
         location_finder.load_mappers_from_file("./src/advent_of_code/day_five/test-input.txt");
 
-        let lowers_location_number = location_finder.find_lowest_location_number();
+        let lowers_location_number = location_finder.find_lowest_location_number_part_one();
 
         assert_eq!(lowers_location_number, 35);
+    }
+
+    #[test]
+    fn gets_lowest_location_number_from_input_file_part_two() {
+        let mut location_finder = LocationFinder::new();
+        location_finder.load_mappers_from_file("./src/advent_of_code/day_five/test-input.txt");
+
+        let lowers_location_number = location_finder.find_lowest_location_number_part_two();
+
+        assert_eq!(lowers_location_number, 46);
     }
 }
