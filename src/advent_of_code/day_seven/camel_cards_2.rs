@@ -23,11 +23,34 @@ fn get_card_strength(card: char) -> u8 {
 
 fn get_hand_strength(hand: &String) -> u8 {
     let mut chars_map = HashMap::new();
+    let mut jokers_count = 0;
     hand.chars().for_each(|c| {
-        let current = *chars_map.get(&c).unwrap_or(&0);
-        chars_map.insert(c, current + 1);
+        if c == 'J' {
+            jokers_count += 1;
+        } else {
+            let current = *chars_map.get(&c).unwrap_or(&0);
+            chars_map.insert(c, current + 1);
+        }
     });
-    let occurences: Vec<&u8> = chars_map.values().collect();
+
+    if jokers_count == 5 {
+        return 6
+    }
+
+    let max = *chars_map.values().max().unwrap_or(&0);
+    let mut has_added_jokers = false;
+    let occurences: Vec<u8> = chars_map
+        .values()
+        .map(|occ| {
+            if *occ == max && !has_added_jokers {
+                has_added_jokers = true;
+                *occ + jokers_count
+            } else {
+                *occ
+            }
+        })
+        .collect();
+
     if occurences.contains(&&5) {
         6
     } else if occurences.contains(&&4) {
@@ -125,25 +148,27 @@ mod test {
         HandData,
     };
 
-    #[test]
-    fn gets_strength_of_a_card() {
-        assert_eq!(get_card_strength('A'), 13);
-        assert_eq!(get_card_strength('T'), 10);
-        assert_eq!(get_card_strength('9'), 9);
-        assert_eq!(get_card_strength('2'), 2);
+    #[rstest]
+    #[case('A', 13)]
+    #[case('T', 10)]
+    #[case('9', 9)]
+    #[case('2', 2)]
+    fn gets_strength_of_a_card(#[case] card: char, #[case] strength: u8) {
+        assert_eq!(get_card_strength(card), strength);
     }
 
-    #[test]
-    fn gets_strength_of_a_hand() {
-        assert_eq!(get_hand_strength(&String::from("32T3K")), 1);
-        assert_eq!(get_hand_strength(&String::from("T55J5")), 3);
-        assert_eq!(get_hand_strength(&String::from("KK677")), 2);
-        assert_eq!(get_hand_strength(&String::from("KTJJT")), 2);
-        assert_eq!(get_hand_strength(&String::from("QQQJA")), 3);
-        assert_eq!(get_hand_strength(&String::from("QQQ22")), 4);
-        assert_eq!(get_hand_strength(&String::from("AAAAA")), 6);
-        assert_eq!(get_hand_strength(&String::from("AKJTQ")), 0);
-        assert_eq!(get_hand_strength(&String::from("2222A")), 5);
+    #[rstest]
+    #[case("32T3K", 1)]
+    #[case("T55J5", 5)]
+    #[case("KK677", 2)]
+    #[case("KTJJT", 5)]
+    #[case("QQQJA", 5)]
+    #[case("QQQ22", 4)]
+    #[case("AAAAA", 6)]
+    #[case("AKJTQ", 1)]
+    #[case("2222A", 5)]
+    fn gets_strength_of_a_hand(#[case] hand: String, #[case] strength: u8) {
+        assert_eq!(get_hand_strength(&hand), strength);
     }
 
     #[rstest]
@@ -155,8 +180,11 @@ mod test {
     #[case("AAAA3", "AAAA4", Ordering::Less)]
     #[case("AAAA4", "AAAA3", Ordering::Greater)]
     #[case("T55J5", "QQQJA", Ordering::Less)]
-    #[case("KK677", "KTJJT", Ordering::Greater)]
-    #[case("KK677", "KTJJT", Ordering::Greater)]
+    #[case("KK677", "KTJJT", Ordering::Less)]
+    #[case("22JJJ", "AAAAB", Ordering::Greater)]
+    #[case("JJJJA", "JJJJJ", Ordering::Greater)]
+    #[case("2222J", "2J222", Ordering::Greater)]
+    #[case("JJJJJ", "AAAAQ", Ordering::Greater)]
     fn determines_which_hand_is_stronger(
         #[case] hand_one: String,
         #[case] hand_two: String,
