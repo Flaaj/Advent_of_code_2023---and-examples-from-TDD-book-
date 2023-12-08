@@ -211,6 +211,6 @@ mod test {
 
         let total_winnings = calculate_total_winnings(hands);
 
-        assert_eq!(total_winnings, 6640)
+        assert_eq!(total_winnings, 6440)
     }
 }
