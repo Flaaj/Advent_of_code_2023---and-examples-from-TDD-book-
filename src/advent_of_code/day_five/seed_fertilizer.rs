@@ -1,3 +1,5 @@
+use std::ops::Range;
+
 use super::{file_reader::FileReader, number_extractor::NumberExtractor};
 
 type MapperRange = (u64, u64, u64);
@@ -61,31 +63,32 @@ impl MappersChain {
             .collect()
     }
 
-    fn get_seed_ranges(&self) -> Vec<u64> {
-        let mut seeds: Vec<u64> = vec![];
-        let ranges_count = &self.seeds.len() / 2;
+    fn get_seed_ranges(&self) -> Vec<Range<u64>> {
+        let mut ranges: Vec<Range<u64>> = vec![];
 
-        for i in 0..ranges_count {
+        for i in 0..(&self.seeds.len() / 2) {
             let range_start = *self.seeds.get(2 * i).unwrap();
             let range_length = *self.seeds.get(2 * i + 1).unwrap();
-            let mut range = (range_start..(range_start + range_length)).collect::<Vec<u64>>();
-            seeds.append(&mut range);
+            let range_end = range_start + range_length;
+
+            ranges.push(range_start..range_end);
         }
 
-        seeds
+        ranges
     }
 
     fn get_locations_of_seed_ranges(&self) -> u64 {
-        let seed_ranges = self.get_seed_ranges();
-        let mut min = 10_000_000_00;
-        for (l, &seed) in seed_ranges.iter().enumerate() {
-            min = min.min(self.get_seed_location(seed));
-        }
-        min
-        // seed_ranges
-        //     .iter()
-        //     .map(|&seed| self.get_seed_location(seed))
-        //     .collect()
+        self.get_seed_ranges()
+            .iter()
+            .map(|range| {
+                range
+                    .clone()
+                    .map(|seed| self.get_seed_location(seed))
+                    .min()
+                    .unwrap()
+            })
+            .min()
+            .unwrap()
     }
 }
 
@@ -210,7 +213,10 @@ impl LocationFinder {
     }
 
     pub fn find_lowest_location_number_part_two(&self) -> u64 {
-        self.mappers_chain.as_ref().unwrap().get_locations_of_seed_ranges()
+        self.mappers_chain
+            .as_ref()
+            .unwrap()
+            .get_locations_of_seed_ranges()
     }
 }
 

@@ -1,14 +1,13 @@
-use crate::advent_of_code::day_five::seed_fertilizer::LocationFinder;
+use advent_of_code::day_six::wait_for_it::get_product_of_winning_races;
 
 // mod currency;
 // mod codewars;
 mod advent_of_code;
 
 fn main() {
-    let mut location_finder = LocationFinder::new();
-    location_finder.load_mappers_from_file("./src/advent_of_code/day_five/input.txt");
+    let product_1 = get_product_of_winning_races(&[(50, 242), (74, 1017), (86, 1691), (85, 1252)]);
+    let product_2 = get_product_of_winning_races(&[(50748685, 242101716911252)]);
 
-    let lowers_location_number = location_finder.find_lowest_location_number_part_two();
-
-    println!("{lowers_location_number}");
+    println!("part 1: {product_1}");
+    println!("part 2: {product_2}");
 }
