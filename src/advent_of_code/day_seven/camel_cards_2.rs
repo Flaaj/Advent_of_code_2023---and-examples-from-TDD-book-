@@ -22,24 +22,24 @@ fn get_card_strength(card: char) -> u8 {
 }
 
 fn get_hand_strength(hand: &String) -> u8 {
-    let mut chars_map = HashMap::new();
+    let mut card_counts_map = HashMap::new();
     let mut jokers_count = 0;
-    hand.chars().for_each(|c| {
-        if c == 'J' {
+    hand.chars().for_each(|card| {
+        if card == 'J' {
             jokers_count += 1;
         } else {
-            let current = *chars_map.get(&c).unwrap_or(&0);
-            chars_map.insert(c, current + 1);
+            let current = *card_counts_map.get(&card).unwrap_or(&0);
+            card_counts_map.insert(card, current + 1);
         }
     });
 
     if jokers_count == 5 {
-        return 6
+        return 6;
     }
 
-    let max = *chars_map.values().max().unwrap_or(&0);
+    let max = *card_counts_map.values().max().unwrap_or(&0);
     let mut has_added_jokers = false;
-    let occurences: Vec<u8> = chars_map
+    let occurences: Vec<u8> = card_counts_map
         .values()
         .map(|occ| {
             if *occ == max && !has_added_jokers {
@@ -115,18 +115,15 @@ impl PartialOrd for HandData {
 }
 
 pub fn read_hands_from_file(filename: &str) -> Vec<HandData> {
-    let file = FileReader::read(filename);
-    let lines: Vec<&str> = file.lines().collect();
-    let hands: Vec<HandData> = lines
-        .iter()
+    FileReader::read(filename)
+        .lines()
         .map(|line| {
-            let split: Vec<&str> = line.split(" ").collect();
+            let split: Vec<_> = line.split(" ").collect();
             let hand = split.get(0).unwrap().to_string();
             let bid = split.get(1).unwrap().parse::<u64>().unwrap();
             HandData { hand, bid }
         })
-        .collect();
-    hands
+        .collect()
 }
 
 pub fn calculate_total_winnings(hands: &mut Vec<HandData>) -> u64 {
