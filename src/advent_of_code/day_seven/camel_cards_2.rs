@@ -22,14 +22,14 @@ fn get_card_strength(card: char) -> u8 {
 }
 
 fn get_hand_strength(hand: &String) -> u8 {
-    let mut chars_map = HashMap::new();
+    let mut card_counts_map = HashMap::new();
     let mut jokers_count = 0;
-    hand.chars().for_each(|c| {
-        if c == 'J' {
+    hand.chars().for_each(|card| {
+        if card == 'J' {
             jokers_count += 1;
         } else {
-            let current = *chars_map.get(&c).unwrap_or(&0);
-            chars_map.insert(c, current + 1);
+            let current = *card_counts_map.get(&card).unwrap_or(&0);
+            card_counts_map.insert(card, current + 1);
         }
     });
 
@@ -37,9 +37,9 @@ fn get_hand_strength(hand: &String) -> u8 {
         return 6
     }
 
-    let max = *chars_map.values().max().unwrap_or(&0);
+    let max = *card_counts_map.values().max().unwrap_or(&0);
     let mut has_added_jokers = false;
-    let occurences: Vec<u8> = chars_map
+    let occurences: Vec<u8> = card_counts_map
         .values()
         .map(|occ| {
             if *occ == max && !has_added_jokers {
