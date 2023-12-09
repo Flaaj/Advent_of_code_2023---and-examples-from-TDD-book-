@@ -34,7 +34,7 @@ fn get_hand_strength(hand: &String) -> u8 {
     });
 
     if jokers_count == 5 {
-        return 6
+        return 6;
     }
 
     let max = *card_counts_map.values().max().unwrap_or(&0);
@@ -115,18 +115,15 @@ impl PartialOrd for HandData {
 }
 
 pub fn read_hands_from_file(filename: &str) -> Vec<HandData> {
-    let file = FileReader::read(filename);
-    let lines: Vec<&str> = file.lines().collect();
-    let hands: Vec<HandData> = lines
-        .iter()
+    FileReader::read(filename)
+        .lines()
         .map(|line| {
-            let split: Vec<&str> = line.split(" ").collect();
+            let split: Vec<_> = line.split(" ").collect();
             let hand = split.get(0).unwrap().to_string();
             let bid = split.get(1).unwrap().parse::<u64>().unwrap();
             HandData { hand, bid }
         })
-        .collect();
-    hands
+        .collect()
 }
 
 pub fn calculate_total_winnings(hands: &mut Vec<HandData>) -> u64 {
