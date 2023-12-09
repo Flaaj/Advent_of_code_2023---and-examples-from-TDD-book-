@@ -72,7 +72,7 @@ mod test {
 
     #[test]
     fn creates_nodes_hashmap_from_input_file() {
-        let nodes = create_nodes_from_file("./src/advent_of_code/day_eight/test-input.txt");
+        let nodes = create_nodes_from_file("./src/advent_of_code/day_eight/test-input-1.txt");
 
         assert_eq!(nodes.directions, vec!['R', 'L']);
         assert_eq!(
@@ -83,7 +83,7 @@ mod test {
 
     #[test]
     fn traverses_from_start_to_end_node() {
-        let nodes = create_nodes_from_file("./src/advent_of_code/day_eight/test-input.txt");
+        let nodes = create_nodes_from_file("./src/advent_of_code/day_eight/test-input-1.txt");
 
         let steps = nodes.traverse();
 

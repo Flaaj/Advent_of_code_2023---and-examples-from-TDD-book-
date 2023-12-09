@@ -1,4 +1,4 @@
-use crate::advent_of_code::day_eight::haunted_wasteland::create_nodes_from_file;
+use crate::advent_of_code::day_eight::haunted_wasteland_2::create_nodes_from_file;
 
 // mod currency;
 // mod codewars;

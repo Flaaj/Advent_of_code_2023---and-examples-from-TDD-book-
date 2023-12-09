@@ -1,3 +1,3 @@
 mod file_reader;
-pub mod haunted_wasteland;
+pub mod haunted_wasteland_2;
 
