@@ -18,6 +18,29 @@ fn get_next_number_of_sequence(sequence: &Vec<i32>) -> i32 {
     last_numbers.iter().fold(0, |acc, num| acc + num)
 }
 
+fn get_previous_number_of_sequence(sequence: &Vec<i32>) -> i32 {
+    let mut first_numbers: Vec<i32> = vec![];
+    let mut sequence = sequence.clone();
+    loop {
+        first_numbers.push(*sequence.get(0).unwrap());
+        let mut diffs: Vec<i32> = vec![];
+        for i in 1..sequence.len() {
+            let diff = sequence.get(i).unwrap() - sequence.get(i - 1).unwrap();
+            diffs.push(diff);
+        }
+        if diffs.iter().all(|&diff| diff == 0) {
+            break;
+        }
+        sequence = diffs
+    }
+    first_numbers.iter().enumerate().fold(0, |acc, (i, &num)| {
+        acc + match i % 2 == 0 {
+            true => num,
+            false => -num,
+        }
+    })
+}
+
 pub fn get_sum_of_next_numbers_from_file(filename: &str) -> i32 {
     let file = read_file(filename);
     file.lines()
@@ -29,8 +52,20 @@ pub fn get_sum_of_next_numbers_from_file(filename: &str) -> i32 {
         .fold(0, |acc, curr| acc + curr)
 }
 
+pub fn get_sum_of_previous_numbers_from_file(filename: &str) -> i32 {
+    let file = read_file(filename);
+    file.lines()
+        .map(|line| {
+            let sequence = parse_numbers_from_string(line);
+            let next_number = get_previous_number_of_sequence(&sequence);
+            next_number
+        })
+        .fold(0, |acc, curr| acc + curr)
+}
 #[cfg(test)]
 mod test {
+    use crate::advent_of_code::day_nine::mirage_maintenance::get_sum_of_previous_numbers_from_file;
+
     use super::{get_next_number_of_sequence, get_sum_of_next_numbers_from_file};
     use rstest::rstest;
 
@@ -50,5 +85,13 @@ mod test {
             get_sum_of_next_numbers_from_file("./src/advent_of_code/day_nine/test-input.txt");
 
         assert_eq!(sum_of_next_numbers, 114);
+    }
+
+    #[test]
+    fn sums_all_previous_numbers_from_input_file() {
+        let sum_of_previous_numbers =
+            get_sum_of_previous_numbers_from_file("./src/advent_of_code/day_nine/test-input.txt");
+
+        assert_eq!(sum_of_previous_numbers, 2);
     }
 }
