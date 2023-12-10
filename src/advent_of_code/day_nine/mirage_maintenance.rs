@@ -42,8 +42,8 @@ fn get_previous_number_of_sequence(sequence: &Vec<i32>) -> i32 {
 }
 
 pub fn get_sum_of_next_numbers_from_file(filename: &str) -> i32 {
-    let file = read_file(filename);
-    file.lines()
+    read_file(filename)
+        .lines()
         .map(|line| {
             let sequence = parse_numbers_from_string(line);
             let next_number = get_next_number_of_sequence(&sequence);
@@ -53,20 +53,21 @@ pub fn get_sum_of_next_numbers_from_file(filename: &str) -> i32 {
 }
 
 pub fn get_sum_of_previous_numbers_from_file(filename: &str) -> i32 {
-    let file = read_file(filename);
-    file.lines()
+    read_file(filename)
+        .lines()
         .map(|line| {
             let sequence = parse_numbers_from_string(line);
-            let next_number = get_previous_number_of_sequence(&sequence);
-            next_number
+            let prev_number = get_previous_number_of_sequence(&sequence);
+            prev_number
         })
         .fold(0, |acc, curr| acc + curr)
 }
 #[cfg(test)]
 mod test {
-    use crate::advent_of_code::day_nine::mirage_maintenance::get_sum_of_previous_numbers_from_file;
-
-    use super::{get_next_number_of_sequence, get_sum_of_next_numbers_from_file};
+    use super::{
+        get_next_number_of_sequence, get_previous_number_of_sequence,
+        get_sum_of_next_numbers_from_file, get_sum_of_previous_numbers_from_file,
+    };
     use rstest::rstest;
 
     #[rstest]
@@ -85,6 +86,19 @@ mod test {
             get_sum_of_next_numbers_from_file("./src/advent_of_code/day_nine/test-input.txt");
 
         assert_eq!(sum_of_next_numbers, 114);
+    }
+
+    #[rstest]
+    #[case(vec![0, 3, 6, 9, 12, 15], -3)]
+    #[case(vec![1, 3, 6, 10, 15, 21], 0)]
+    #[case(vec![10, 13, 16, 21, 30, 45], 5)]
+    fn gets_previous_number_of_sequence(
+        #[case] sequence: Vec<i32>,
+        #[case] expected_next_number: i32,
+    ) {
+        let next_number = get_previous_number_of_sequence(&sequence);
+
+        assert_eq!(next_number, expected_next_number);
     }
 
     #[test]
