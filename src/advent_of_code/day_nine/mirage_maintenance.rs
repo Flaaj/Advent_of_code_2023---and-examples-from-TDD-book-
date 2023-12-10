@@ -94,11 +94,11 @@ mod test {
     #[case(vec![10, 13, 16, 21, 30, 45], 5)]
     fn gets_previous_number_of_sequence(
         #[case] sequence: Vec<i32>,
-        #[case] expected_next_number: i32,
+        #[case] expected_previous_number: i32,
     ) {
         let previous_number = get_previous_number_of_sequence(&sequence);
 
-        assert_eq!(previous_number, expected_next_number);
+        assert_eq!(previous_number, expected_previous_number);
     }
 
     #[test]
