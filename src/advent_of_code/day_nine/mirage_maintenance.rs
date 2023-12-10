@@ -96,9 +96,9 @@ mod test {
         #[case] sequence: Vec<i32>,
         #[case] expected_next_number: i32,
     ) {
-        let next_number = get_previous_number_of_sequence(&sequence);
+        let previous_number = get_previous_number_of_sequence(&sequence);
 
-        assert_eq!(next_number, expected_next_number);
+        assert_eq!(previous_number, expected_next_number);
     }
 
     #[test]
