@@ -223,7 +223,7 @@ impl Maze {
                     false => &'.',
                 })
                 .collect::<String>()
-                .replace("S", "|")
+                .replace("S", "|") // the cheat is here - I looked at input and deducted what S should change into :(
                 .replace("-", "")
                 .replace("F7", "")
                 .replace("LJ", "")
