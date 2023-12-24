@@ -151,7 +151,7 @@ mod test {
     }
 
     #[test]
-    fn expands_galaxy_by_n_times() {
+    fn expands_universe_by_n_times() {
         let string = read_file("./src/advent_of_code/day_eleven/test-input.txt");
         let mut universe = Universe::from(string);
 
