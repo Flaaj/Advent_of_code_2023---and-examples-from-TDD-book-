@@ -1,13 +1,15 @@
-use advent_of_code::day_ten::pipe_maze::get_longest_loop_from_input_file;
-
-use crate::advent_of_code::day_ten::pipe_maze::get_area_enclosed_by_main_loop;
+use crate::advent_of_code::day_eleven::{file_reader::read_file, cosmic_expansion::Universe};
 
 // mod currency;
 // mod codewars;
 mod advent_of_code;
 
 fn main() {
-    let longest_loop = get_area_enclosed_by_main_loop("./src/advent_of_code/day_ten/input.txt");
+    let string = read_file("./src/advent_of_code/day_eleven/input.txt");
+    let mut universe = Universe::from(string);
 
-    println!("{longest_loop}")
+    universe.expand(999_999);
+    let sum = universe.get_sum_of_shortest_distances_between_galaxies();
+
+    println!("{sum}");
 }
